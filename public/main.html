@@ -10,7 +10,7 @@
 <body class="bg-gray-100 min-w-screen min-h-screen">
     <!-- Header -->
     <header class="bg-blue-600 text-white flex items-center justify-between p-4">
-        <a href="home.html">
+        <a href="/main">
             <img src="assets/img/logo-zipp.png" alt="logo-zipp" class="w-10 h-10">
         </a>
         <span id="username-display" class="text-white text-sm font-medium mr-4">
@@ -79,12 +79,15 @@
 
     // Recuperar e exibir o último acesso
     const lastAccess = getCookie('lastAccess');
+    const lastAccessElement = document.getElementById('last-access');
 
-    const formattedDate = new Date(lastAccess).toLocaleString('pt-BR', {
-      dateStyle: 'short',
-      timeStyle: 'short',
-    });
-    document.getElementById('last-access').textContent = `Último acesso: ${formattedDate}`;
+    if (lastAccess) {
+      const formattedDate = new Date(lastAccess).toLocaleString('pt-BR', {
+        dateStyle: 'short',
+        timeStyle: 'short',
+      });
+      lastAccessElement.textContent = `Último acesso: ${formattedDate}`;
+    }
 
   });
       document.addEventListener('DOMContentLoaded', () => {

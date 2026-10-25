@@ -70,10 +70,7 @@
         const username = document.getElementById('name').value.trim();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim();
-    
-        // Resetando mensagem de erro
-        errorMessage.textContent = '';
-    
+
         // Validação de campos
         if (!username || username.length < 3) {
           event.preventDefault();

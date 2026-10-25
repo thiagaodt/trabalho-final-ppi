@@ -41,7 +41,12 @@ router.post('/login', (req, res) => {
   req.session.loggedIn = true;
   req.session.username = username;
 
-  res.cookie('lastAccess', now.toISOString(), { maxAge: 30 * 60 * 1000, httpOnly: true });
+  // Cookie legível pelo front-end para exibir o último acesso na tela principal
+  res.cookie('lastAccess', now.toISOString(), {
+    maxAge: 30 * 60 * 1000,
+    httpOnly: false,
+    sameSite: 'lax',
+  });
   res.json({ success: true });
 });
 
