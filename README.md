@@ -1,42 +1,135 @@
-# Bate-papo WEB - Trabalho Final PPI
-Sistema de sala de bate-papo desenvolvido como avaliação final para a disciplina de Programação para Internet do curso de ADS (2º semestre de 2024) na FIPP/Unoeste. O projeto consiste em uma aplicação web funcional com gerenciamento de sessões, persistência temporária de dados e validação no lado do servidor.
+# Zipp — Bate-papo WEB (Trabalho Final PPI)
 
-## 🚀 Status do Projeto
-O projeto foi entregue com 100% de aproveitamento nos critérios avaliativos:
+> Aplicação de bate-papo com login, cadastro de usuários e controle de sessão, feita com Express e publicado na Vercel.
 
-✅ Disponibilidade na Vercel.
+**EN:** A small chat web app built with Express and server-side sessions. Users register, log in and exchange
+private messages; the last access date is stored in a cookie.
 
-✅ Registro de último acesso via cookies.
+![Tela do bate-papo](docs/screenshots/bate-papo.png)
 
-✅ Cadastro e listagem de usuários.
+## Sobre
 
-✅ Validação de dados no servidor.
+Trabalho final da disciplina de **Programação para Internet** do curso de **ADS — FIPP/Unoeste**, no
+**2º semestre de 2024**. O trabalho pedia uma aplicação web funcional com gerenciamento de sessões,
+persistência temporária de dados e validação no lado do servidor. Foi entregue com aproveitamento máximo
+nos critérios avaliativos e está publicado na Vercel.
 
-✅ Bate-papo funcional com seleção de usuários cadastrados.
+O projeto não usa banco de dados: usuários e mensagens ficam em memória no servidor e são perdidos quando
+ele reinicia.
 
-✅ Bloqueio de mensagens vazias ou anônimas.
+## Funcionalidades
 
-## 🛠️ Tecnologias Utilizadas
-A aplicação foi construída utilizando o ecossistema Node.js:
+- Login e logout com sessão válida por 30 minutos.
+- Cadastro de usuários com validação no servidor (nome com 3+ caracteres, e-mail válido, senha com 4+).
+- Lista de contatos com todos os usuários cadastrados, exceto o usuário logado.
+- Conversa privada entre dois usuários, com histórico cronológico e horário de cada mensagem.
+- Bloqueio de mensagens vazias e de acesso às rotas internas sem login.
+- Exibição do último acesso na tela principal, guardado em cookie.
 
-*Node.js & Express:* Framework base para o servidor e roteamento.
+## Tecnologias
 
-*Express-session:* Gerenciamento de sessões de usuário (login ativo por 30 minutos).
+- Node.js 18+
+- Express 4.21.2
+- express-session 1.18.1
+- body-parser 1.20.3
+- dotenv 17.x
+- Tailwind CSS (via CDN)
+- Vercel (deploy)
 
-*Cookie-parser:* Manipulação de cookies para armazenar a data/hora do último acesso.
+## Arquitetura
 
-*EJS / View Engine:* Renderização dinâmica de conteúdo no lado do servidor.
+```
+trabalho-final-ppi/
+├── app.js                 # sobe o Express, configura sessão e registra as rotas
+├── routes/
+│   └── main.js            # rotas de login, cadastro, contatos e mensagens
+├── public/
+│   ├── login.html         # tela de login
+│   ├── register.html      # tela de cadastro
+│   ├── main.html          # tela principal com contatos e chat
+│   └── assets/img/        # logo e ícone de logout
+├── docs/screenshots/      # prints usados no README
+└── vercel.json            # configuração de build na Vercel
+```
 
-*Vercel:* Plataforma de hospedagem e deploy contínuo.
+As páginas são HTML estático servido por `express.static`; o estado fica em dois arrays dentro de
+`routes/main.js` (`users` e `messagesStore`). O navegador conversa com o backend por `fetch` em JSON.
 
-## 📋 Funcionalidades
+## Como rodar
 
-*Autenticação:* Sistema de login e logout para controle de acesso às funcionalidades de cadastro e chat.
+### Pré-requisitos
 
-*Cadastro de Usuários:* Formulário com validação no servidor para coletar Nome, nickname, email e senha.
+- Node.js 18 ou superior
 
-*Sala de Bate-papo:* Interface para envio de mensagens onde o remetente é selecionado a partir da lista de usuários já cadastrados.
+### Variáveis de ambiente
 
-*Histórico de Mensagens:* Exibição cronológica das interações com inserção automática de data e hora pelo servidor.
+Copie `.env.example` para `.env`:
 
-*Rastreamento de Acesso:* Exibição da data e hora do último acesso do usuário no menu principal através de cookies.
+| Variável | Para que serve | Exemplo |
+| --- | --- | --- |
+| `PORT` | Porta do servidor | `3000` |
+| `SESSION_SECRET` | Segredo que assina o cookie de sessão (obrigatório em produção) | `troque-por-um-valor-aleatorio-longo` |
+| `NODE_ENV` | Ambiente da aplicação | `development` |
+
+Com `NODE_ENV=production` e sem `SESSION_SECRET`, o servidor se recusa a subir. Em desenvolvimento, ele
+usa um segredo temporário e avisa no console.
+
+### Instalação e execução
+
+```bash
+npm install
+npm start        # ou: npm run dev
+```
+
+Acesse `http://localhost:3000`.
+
+### Usuários de teste
+
+Não há seed: cadastre dois usuários em `/register` e entre com um deles para ver o outro na lista de
+contatos. As contas existem só enquanto o servidor estiver rodando. As senhas ficam em memória, sem hash,
+porque o foco do trabalho era sessão e validação — não use senhas reais.
+
+## Uso / API
+
+| Rota | Método | O que faz |
+| --- | --- | --- |
+| `/` | GET | Página de login |
+| `/login` | POST | Valida usuário/senha e cria a sessão |
+| `/logout` | GET | Encerra a sessão |
+| `/register` | GET | Página de cadastro |
+| `/cadastrarUsuario` | POST | Valida e cadastra um usuário |
+| `/user` | GET | Nome do usuário logado |
+| `/users` | GET | Lista de contatos (sem o usuário logado) |
+| `/send-message` | POST | Envia uma mensagem |
+| `/get-messages/:recipient` | GET | Histórico da conversa com um contato |
+| `/main` | GET | Tela principal (exige login) |
+
+## Telas
+
+| Login | Cadastro |
+| --- | --- |
+| ![Login](docs/screenshots/login.png) | ![Cadastro](docs/screenshots/cadastro.png) |
+
+## Testes
+
+O projeto não tem testes automatizados. A verificação manual é cadastrar dois usuários, trocar mensagens
+entre eles e conferir o último acesso exibido no topo da tela principal.
+
+## Deploy
+
+- Aplicação: <https://trabalho-final-ppi-kohl.vercel.app>
+
+> **Atenção:** a variável `SESSION_SECRET` precisa ser cadastrada no projeto da Vercel antes do próximo
+> deploy, senão a aplicação não sobe em produção.
+
+## O que aprendi
+
+<!-- TODO: pedir ao Thiago de 3 a 5 aprendizados técnicos deste projeto -->
+
+## Licença
+
+Distribuído sob a licença MIT. Veja [LICENSE](LICENSE).
+
+## Autor
+
+Thiago Enrico Costa Cardoso — [LinkedIn](https://www.linkedin.com/in/thiago-enrico-costa-cardoso/) · [Portfólio](https://teccdev.com.br/)
